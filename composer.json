@@ -11,7 +11,8 @@
 		"crawl"
 	],
 	"require": {
-		"contao/core-bundle": "^4.13 || ^5.0"
+		"contao/core-bundle": "^4.13 || ^5.0",
+		"google/apiclient": "^2.15"
 	},
 	"license": "LGPL-3.0-or-later",
 	"autoload": {
