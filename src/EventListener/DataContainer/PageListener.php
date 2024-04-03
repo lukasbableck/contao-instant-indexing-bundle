@@ -25,7 +25,8 @@ class PageListener {
 				if (null === $objPage) {
 					continue;
 				}
-				if (!$objPage->rootPage->googleServiceAccountJSON) {
+				$rootPage = PageModel::findByPk($objPage->rootId);
+				if (!$rootPage->googleServiceAccountJSON) {
 					continue;
 				}
 
@@ -33,7 +34,7 @@ class PageListener {
 				$dc->activeRecord = $objPage;
 
 				$pageUrl = $objPage->getAbsoluteUrl();
-				$googleClient->index($pageUrl, $objPage->rootPage->googleServiceAccountJSON);
+				$this->googleClient->index($pageUrl, html_entity_decode($rootPage->googleServiceAccountJSON));
 			}
 		}
 

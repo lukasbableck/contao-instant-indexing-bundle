@@ -17,7 +17,7 @@ class Google {
 			$client->setHttpClient($guzzleClient);
 		}
 
-		$client->setAuthConfig($authConfig);
+		$client->setAuthConfig(json_decode($authConfig, true));
 		$client->addScope('https://www.googleapis.com/auth/indexing');
 
 		$httpClient = $client->authorize();
@@ -25,8 +25,8 @@ class Google {
 		$body = '{"url": "'.$url.'",  "type": "URL_UPDATED"}';
 		$response = $httpClient->post($endpoint, ['body' => $body]);
 
-		if ($response->getStatusCode() != 200) {
-			throw new Exception('Error while indexing URL', $response->getStatusCode());
+		if (200 != $response->getStatusCode()) {
+			throw new \Exception('Error while indexing URL: '.$response->getStatusCode());
 		}
 	}
 }
