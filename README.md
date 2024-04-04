@@ -9,7 +9,7 @@ composer require lukasbableck/contao-instant-indexing-bundle
 ```
 
 ## Configuration
-1. Create a new project in the (Google Cloud Console)[https://console.cloud.google.com/apis/enableflow?apiid=indexing.googleapis.com&credential=client_key]
+1. Create a new project in the [Google Cloud Console](https://console.cloud.google.com/apis/enableflow?apiid=indexing.googleapis.com&credential=client_key)
 2. Enable the Google Indexing API
 3. Create a new service account and a new private key (JSON) for the account
 4. Add the service account email to the Google Search Console with the "Owner" role
