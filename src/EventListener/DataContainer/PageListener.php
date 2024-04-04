@@ -56,7 +56,7 @@ class PageListener extends Backend {
 	}
 
 	#[AsCallback(table: 'tl_page', target: 'config.ondelete')]
-	public function onDelete(DataContainer $dc): void {
+	public function onDelete(DataContainer $dc, int $undoId): void {
 		if ('regular' !== $dc->activeRecord->type) {
 			return;
 		}
