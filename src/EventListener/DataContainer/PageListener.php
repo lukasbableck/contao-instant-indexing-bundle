@@ -9,7 +9,7 @@ use Contao\PageModel;
 use Contao\System;
 use LukasBableck\ContaoInstantIndexingBundle\Client\Google;
 
-class PageListener extends Backend{
+class PageListener extends Backend {
 	public function __construct(private Google $googleClient) {
 	}
 
@@ -53,5 +53,22 @@ class PageListener extends Backend{
 		if (!$rootPageModel->googleServiceAccountJSON) {
 			return;
 		}
+	}
+
+	#[AsCallback(table: 'tl_page', target: 'config.ondelete')]
+	public function onDelete(DataContainer $dc): void {
+		if ('regular' !== $dc->activeRecord->type) {
+			return;
+		}
+
+		$rootPage = $dc->activeRecord->loadDetails()->rootId;
+		$rootPageModel = PageModel::findByPk($rootPage);
+
+		if (!$rootPageModel->googleServiceAccountJSON || !$rootPageModel->autoUnindexGoogle) {
+			return;
+		}
+
+		$pageUrl = $dc->activeRecord->getAbsoluteUrl();
+		$this->googleClient->publish($pageUrl, html_entity_decode($rootPageModel->googleServiceAccountJSON), true);
 	}
 }

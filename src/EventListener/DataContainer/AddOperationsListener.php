@@ -15,7 +15,6 @@ class AddOperationsListener extends Backend {
 	}
 
 	public function __invoke(string $table): void {
-		$request = System::getContainer()->get('request_stack')->getCurrentRequest();
 		if ('tl_page' !== $table && 'tl_news' !== $table && 'tl_calendar_events' !== $table && 'tl_faq' !== $table) {
 			return;
 		}
