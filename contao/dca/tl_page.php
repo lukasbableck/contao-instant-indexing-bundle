@@ -8,15 +8,17 @@ $GLOBALS['TL_DCA']['tl_page']['fields']['googleServiceAccountJSON'] = [
 	'eval' => ['tl_class' => 'long clr', 'rte' => 'ace|json'],
 	'sql' => 'text NULL',
 ];
-
-$GLOBALS['TL_DCA']['tl_page']['list']['operations']['indexGoogle'] = [
-	'label' => &$GLOBALS['TL_LANG']['MSC']['indexGoogle'],
-	'href' => 'key=indexGoogle',
-	'icon' => 'google.svg',
+$GLOBALS['TL_DCA']['tl_page']['fields']['autoIndexGoogle'] = [
+	'exclude' => true,
+	'inputType' => 'checkbox',
+	'eval' => ['tl_class' => 'w50'],
+	'sql' => "char(1) NOT NULL default ''",
 ];
 
 PaletteManipulator::create()
-	->addField('googleServiceAccountJSON', 'website_legend', PaletteManipulator::POSITION_APPEND)
+	->addLegend('instant_index_legend', 'website_legend', PaletteManipulator::POSITION_AFTER)
+	->addField('googleServiceAccountJSON', 'instant_index_legend', PaletteManipulator::POSITION_APPEND)
+	->addField('autoIndexGoogle', 'instant_index_legend', PaletteManipulator::POSITION_APPEND)
 	->applyToPalette('root', 'tl_page')
 	->applyToPalette('rootfallback', 'tl_page')
 ;

@@ -10,16 +10,7 @@
 		"publish",
 		"crawl"
 	],
-	"require": {
-		"contao/core-bundle": "^4.13 || ^5.0",
-		"google/apiclient": "^2.15"
-	},
 	"license": "LGPL-3.0-or-later",
-	"autoload": {
-		"psr-4": {
-			"LukasBableck\\ContaoInstantIndexingBundle\\": "src/"
-		}
-	},
 	"authors": [
 		{
 			"name": "Lukas Bableck",
@@ -27,11 +18,26 @@
 			"homepage": "https://bableck.dev"
 		}
 	],
+	"require": {
+		"php": "^8.0",
+		"contao/core-bundle": "^4.13 || ^5.0",
+		"google/apiclient": "^2.15"
+	},
+	"suggest": {
+		"contao/calendar-bundle": "^4.13 || ^5.0",
+		"contao/faq-bundle": "^4.13 || ^5.0",
+		"contao/news-bundle": "^4.13 || ^5.0"
+	},
 	"conflict": {
 		"contao/manager-plugin": "<2.0 || >=3.0"
 	},
 	"require-dev": {
 		"contao/manager-plugin": "^2.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"LukasBableck\\ContaoInstantIndexingBundle\\": "src/"
+		}
 	},
 	"extra": {
 		"contao-manager-plugin": "LukasBableck\\ContaoInstantIndexingBundle\\ContaoManager\\Plugin"
