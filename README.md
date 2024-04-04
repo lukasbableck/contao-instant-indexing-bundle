@@ -1,6 +1,8 @@
 # contao-instant-indexing-bundle (WIP)
 This bundle allows to send a crawl request to the Google Indexing API for newly published pages, news, calendar events and faqs either automatically or manually.
+
 The API is intended for pages that contain JobPosting or BroadcastEvent structured data but it actually works for any page.
+
 This is useful for sites that publish time-sensitive content and want to have it indexed as soon as possible.
 
 ## Installation
@@ -17,5 +19,7 @@ composer require lukasbableck/contao-instant-indexing-bundle
 
 ## Usage
 If enabled in the root page settings, the bundle will send a crawl request to the Google Indexing API for newly published pages, news, calendar events and faqs automatically.
-You can also manually send a crawl request by clicking the "Send crawl request" button in the page list.
+
+You can also manually send a crawl request by clicking the "Submit this page to Google for indexing" button in the page list.
+
 Deleted pages can also be removed from the index automatically if the option is enabled in the root page settings.
