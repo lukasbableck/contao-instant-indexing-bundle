@@ -13,7 +13,7 @@ class AddOperationsListener {
 		$GLOBALS['TL_DCA'][$table]['list']['operations']['indexGoogle'] = [
 			'label' => &$GLOBALS['TL_LANG']['MSC']['indexGoogle'],
 			'href' => 'key=indexGoogle',
-			'icon' => 'resend.svg',
+			'icon' => 'bundles/contaoinstantindexing/icons/google.svg',
 		];
 	}
 }
