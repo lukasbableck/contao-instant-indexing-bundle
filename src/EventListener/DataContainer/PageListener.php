@@ -29,13 +29,11 @@ class PageListener extends Backend {
 				if (!$rootPage->googleServiceAccountJSON) {
 					continue;
 				}
-
 				$pageUrl = $objPage->getAbsoluteUrl();
 				$this->googleClient->publish($pageUrl, html_entity_decode($rootPage->googleServiceAccountJSON));
 			}
 			$this->redirect($this->getReferer());
 		}
-
 		$arrButtons['indexGoogle'] = '<button type="submit" name="index_google" id="index_google" class="tl_submit" accesskey="i">'.$GLOBALS['TL_LANG']['MSC']['indexGoogleSelected'].'</button> ';
 
 		return $arrButtons;
@@ -46,13 +44,7 @@ class PageListener extends Backend {
 		if ('regular' !== $dc->activeRecord->type) {
 			return;
 		}
-
-		$rootPage = $dc->activeRecord->loadDetails()->rootId;
-		$rootPageModel = PageModel::findByPk($rootPage);
-
-		if (!$rootPageModel->googleServiceAccountJSON) {
-			return;
-		}
+		// TODO
 	}
 
 	#[AsCallback(table: 'tl_page', target: 'config.ondelete')]
@@ -60,15 +52,12 @@ class PageListener extends Backend {
 		if ('regular' !== $dc->activeRecord->type) {
 			return;
 		}
-
-		$rootPage = $dc->activeRecord->loadDetails()->rootId;
-		$rootPageModel = PageModel::findByPk($rootPage);
-
-		if (!$rootPageModel->googleServiceAccountJSON || !$rootPageModel->autoUnindexGoogle) {
+		$page = PageModel::findByPk($dc->activeRecord->id)->loadDetails();
+		$rootPage = PageModel::findByPk($page->rootId);
+		if (!$rootPage->googleServiceAccountJSON || !$rootPage->autoUnindexGoogle) {
 			return;
 		}
-
-		$pageUrl = $dc->activeRecord->getAbsoluteUrl();
-		$this->googleClient->publish($pageUrl, html_entity_decode($rootPageModel->googleServiceAccountJSON), true);
+		$pageUrl = $page->getAbsoluteUrl();
+		$this->googleClient->publish($pageUrl, html_entity_decode($rootPage->googleServiceAccountJSON), true);
 	}
 }
