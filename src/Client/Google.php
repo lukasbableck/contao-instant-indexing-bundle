@@ -1,9 +1,15 @@
 <?php
 namespace LukasBableck\ContaoInstantIndexingBundle\Client;
 
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Google\Client;
+use Monolog\Logger;
 
 class Google {
+
+	public function __construct(private Logger $logger) {
+	}
+
 	public function publish(string $url, string $authConfig, bool $delete = false): void {
 		$client = new Client();
 		$phpModules = get_loaded_extensions();
@@ -25,8 +31,10 @@ class Google {
 		$response = $httpClient->post($endpoint, ['body' => $body]);
 
 		if (200 != $response->getStatusCode()) {
-			throw new \Exception('Error while indexing URL: '.$response->getStatusCode(), $response->getBody());
+			$logger->log(Logger::ERROR, 'Error while submitting URL: '.$response->getStatusCode(), ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
+			return;
 		}
+		$logger->log(Logger::INFO, 'URL submitted to Google: '.$url, ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
 	}
 
 	public function getMetadata(string $url, string $authConfig): array {
@@ -49,7 +57,7 @@ class Google {
 		$response = $httpClient->get($endpoint);
 
 		if (200 != $response->getStatusCode()) {
-			throw new \Exception('Error while getting metadata: '.$response->getStatusCode(), $response->getBody());
+			$logger->log(Logger::ERROR, 'Error while getting metadata: '.$response->getStatusCode(), ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
 		}
 
 		return json_decode($response->getBody(), true);

@@ -10,7 +10,7 @@ use Contao\System;
 use LukasBableck\ContaoInstantIndexingBundle\Client\Google;
 
 class PageListener extends Backend {
-	public function __construct(private Google $googleClient) {
+	public function __construct(private Google $googleClient, private RequestStack $requestStack) {
 	}
 
 	#[AsCallback(table: 'tl_page', target: 'select.buttons')]
@@ -44,7 +44,16 @@ class PageListener extends Backend {
 		if ('regular' !== $dc->activeRecord->type) {
 			return;
 		}
-		// TODO
+		$newRecords = $requestStack->getBag("contao_backend")->get('new_records');
+		if(is_array($newRecords) && array_key_exists("tl_page", $newRecords) && in_array($dc->activeRecord->id, $newRecords["tl_page"])){
+			$page = PageModel::findByPk($dc->activeRecord->id)->loadDetails();
+			$rootPage = PageModel::findByPk($page->rootId);
+			if (!$rootPage->googleServiceAccountJSON || !$rootPage->autoIndexGoogle) {
+				return;
+			}
+			$pageUrl = $page->getAbsoluteUrl();
+			$this->googleClient->publish($pageUrl, html_entity_decode($rootPage->googleServiceAccountJSON));
+		}
 	}
 
 	#[AsCallback(table: 'tl_page', target: 'config.ondelete')]
