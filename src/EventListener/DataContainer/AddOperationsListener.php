@@ -4,9 +4,7 @@ namespace LukasBableck\ContaoInstantIndexingBundle\EventListener\DataContainer;
 use Contao\Backend;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\Input;
-use Contao\NewsModel;
 use Contao\PageModel;
-use Contao\System;
 use LukasBableck\ContaoInstantIndexingBundle\Client\Google;
 
 #[AsHook('loadDataContainer')]
@@ -34,13 +32,13 @@ class AddOperationsListener extends Backend {
 					$page = PageModel::findWithDetails(Input::get('id'));
 					break;
 				case 'tl_news':
-					$model = NewsModel::findByPk(Input::get('id'));
+					$model = \Contao\NewsModel::findByPk(Input::get('id'));
 					break;
 				case 'tl_calendar_events':
-					$model = CalendarEventsModel::findByPk(Input::get('id'));
+					$model = \Contao\CalendarEventsModel::findByPk(Input::get('id'));
 					break;
 				case 'tl_faq':
-					$model = FaqModel::findByPk(Input::get('id'));
+					$model = \Contao\FaqModel::findByPk(Input::get('id'));
 			}
 
 			if (null !== $model && null === $page) {

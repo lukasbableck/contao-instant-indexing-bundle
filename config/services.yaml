@@ -3,9 +3,6 @@ services:
         autowire: true
         autoconfigure: true
         public: false
-    LukasBableck\ContaoInstantIndexingBundle\:
-        resource: ../src
-        exclude: ../src/{Resources}
     LukasBableck\ContaoInstantIndexingBundle\EventListener\:
         resource: ../src/EventListener
         public: true

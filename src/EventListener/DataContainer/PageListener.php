@@ -8,6 +8,7 @@ use Contao\Input;
 use Contao\PageModel;
 use Contao\System;
 use LukasBableck\ContaoInstantIndexingBundle\Client\Google;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class PageListener extends Backend {
 	public function __construct(private Google $googleClient, private RequestStack $requestStack) {
@@ -44,7 +45,7 @@ class PageListener extends Backend {
 		if ('regular' !== $dc->activeRecord->type) {
 			return;
 		}
-		$newRecords = $requestStack->getBag("contao_backend")->get('new_records');
+		$newRecords = System::getContainer()->get('request_stack')->getSession()->getBag("contao_backend")->get('new_records');
 		if(is_array($newRecords) && array_key_exists("tl_page", $newRecords) && in_array($dc->activeRecord->id, $newRecords["tl_page"])){
 			$page = PageModel::findByPk($dc->activeRecord->id)->loadDetails();
 			$rootPage = PageModel::findByPk($page->rootId);
