@@ -1,4 +1,4 @@
-# contao-instant-indexing-bundle (WIP)
+# contao-instant-indexing-bundle
 This bundle allows to send a crawl request to the Google Indexing API for newly published pages, news, calendar events and faqs either automatically or manually.
 
 The API is intended for pages that contain JobPosting or BroadcastEvent structured data but it actually works for any page.
