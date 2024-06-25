@@ -4,8 +4,10 @@ namespace LukasBableck\ContaoInstantIndexingBundle\EventListener\DataContainer;
 use Contao\Backend;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
+use Contao\Image;
 use Contao\Input;
 use Contao\PageModel;
+use Contao\StringUtil;
 use Contao\System;
 use LukasBableck\ContaoInstantIndexingBundle\Client\Google;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -33,6 +35,14 @@ class PageListener extends Backend {
 		if ('regular' !== $row['type']) {
 			return '';
 		}
+
+        return sprintf(
+            '<a href="%s" title="%s"%s>%s</a> ',
+            Backend::addToUrl($href . '&amp;id=' . $row['id']),
+            StringUtil::specialchars($title),
+            $attributes,
+            Image::getHtml($icon, $label)
+        );
 	}
 
 	#[AsCallback(table: 'tl_page', target: 'select.buttons')]
