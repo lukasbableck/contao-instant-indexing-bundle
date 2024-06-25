@@ -10,9 +10,15 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
 use LukasBableck\ContaoInstantIndexingBundle\Client\Google;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PageListener extends Backend {
+	private static $queue = [];
+
 	public function __construct(private Google $googleClient, private RequestStack $requestStack) {
 	}
 
@@ -36,13 +42,41 @@ class PageListener extends Backend {
 			return '';
 		}
 
-        return sprintf(
-            '<a href="%s" title="%s"%s>%s</a> ',
-            Backend::addToUrl($href . '&amp;id=' . $row['id']),
-            StringUtil::specialchars($title),
-            $attributes,
-            Image::getHtml($icon, $label)
-        );
+		return sprintf(
+			'<a href="%s" title="%s"%s>%s</a> ',
+			Backend::addToUrl($href.'&amp;id='.$row['id']),
+			StringUtil::specialchars($title),
+			$attributes,
+			Image::getHtml($icon, $label)
+		);
+	}
+
+	#[AsEventListener(KernelEvents::TERMINATE)]
+	public function onTerminate(KernelEvent $event): void {
+		if (empty(self::$queue)) {
+			return;
+		}
+		foreach (self::$queue as $item) {
+			if (array_key_exists('page', $item)) {
+				$page = PageModel::findByPk($item['page']);
+				$page->refresh();
+				$urlGenerator = System::getContainer()->get('contao.routing.content_url_generator');
+				$urlGenerator->reset();
+				$pageUrl = $urlGenerator->generate($page, [], UrlGeneratorInterface::ABSOLUTE_URL);
+				if (array_key_exists('delete', $item)) {
+					$this->googleClient->publish($pageUrl, html_entity_decode($item['rootPage']->googleServiceAccountJSON, true));
+				} else {
+					$this->googleClient->publish($pageUrl, html_entity_decode($item['rootPage']->googleServiceAccountJSON));
+				}
+			}else if (array_key_exists('pageUrl', $item)) {
+				if (array_key_exists('delete', $item)) {
+					$this->googleClient->publish($item['pageUrl'], html_entity_decode($item['rootPage']->googleServiceAccountJSON, true));
+				} else {
+					$this->googleClient->publish($item['pageUrl'], html_entity_decode($item['rootPage']->googleServiceAccountJSON));
+				}
+			}
+		}
+		self::$queue = [];
 	}
 
 	#[AsCallback(table: 'tl_page', target: 'select.buttons')]
@@ -57,12 +91,12 @@ class PageListener extends Backend {
 				if (null === $page) {
 					continue;
 				}
+				$pageId = $page->id;
 				$rootPage = PageModel::findByPk($page->rootId);
 				if (!$rootPage->googleServiceAccountJSON) {
 					continue;
 				}
-				$pageUrl = $page->getAbsoluteUrl();
-				$this->googleClient->publish($pageUrl, html_entity_decode($rootPage->googleServiceAccountJSON));
+				self::$queue[] = ['page' => $pageId, 'rootPage' => $rootPage];
 			}
 			$this->redirect($this->getReferer());
 		}
@@ -71,7 +105,7 @@ class PageListener extends Backend {
 		return $arrButtons;
 	}
 
-	#[AsCallback(table: 'tl_page', target: 'config.onsubmit')]
+	#[AsCallback(table: 'tl_page', target: 'config.onsubmit', priority: -100)]
 	public function onSubmit(DataContainer $dc): void {
 		if ('regular' !== $dc->activeRecord->type) {
 			return;
@@ -79,12 +113,12 @@ class PageListener extends Backend {
 		$newRecords = System::getContainer()->get('request_stack')->getSession()->getBag('contao_backend')->get('new_records');
 		if (\is_array($newRecords) && \array_key_exists('tl_page', $newRecords) && \in_array($dc->activeRecord->id, $newRecords['tl_page'])) {
 			$page = PageModel::findByPk($dc->activeRecord->id)->loadDetails();
+			$pageId = $page->id;
 			$rootPage = PageModel::findByPk($page->rootId);
 			if (!$rootPage->googleServiceAccountJSON || !$rootPage->autoIndexGoogle) {
 				return;
 			}
-			$pageUrl = $page->getAbsoluteUrl();
-			$this->googleClient->publish($pageUrl, html_entity_decode($rootPage->googleServiceAccountJSON));
+			self::$queue[] = ['page' => $pageId, 'rootPage' => $rootPage];
 		}
 	}
 
@@ -94,11 +128,12 @@ class PageListener extends Backend {
 			return;
 		}
 		$page = PageModel::findByPk($dc->activeRecord->id)->loadDetails();
+		$urlGenerator = System::getContainer()->get('contao.routing.content_url_generator');
+		$pageUrl = $urlGenerator->generate($page, [], UrlGeneratorInterface::ABSOLUTE_URL);
 		$rootPage = PageModel::findByPk($page->rootId);
 		if (!$rootPage->googleServiceAccountJSON || !$rootPage->autoUnindexGoogle) {
 			return;
 		}
-		$pageUrl = $page->getAbsoluteUrl();
-		$this->googleClient->publish($pageUrl, html_entity_decode($rootPage->googleServiceAccountJSON), true);
+		self::$queue[] = ['pageUrl' => $pageUrl, 'rootPage' => $rootPage, 'delete' => true];
 	}
 }
