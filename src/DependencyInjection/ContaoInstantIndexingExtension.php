@@ -1,5 +1,4 @@
 <?php
-
 namespace LukasBableck\ContaoInstantIndexingBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;

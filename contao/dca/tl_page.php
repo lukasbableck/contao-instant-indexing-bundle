@@ -14,7 +14,7 @@ $GLOBALS['TL_DCA']['tl_page']['fields']['autoIndexGoogle'] = [
 	'eval' => ['tl_class' => 'w50 clr'],
 	'sql' => "char(1) NOT NULL default ''",
 ];
-$GLOBALS['TL_DCA']['tl_page']['fields']['autoIndexGoogle'] = [
+$GLOBALS['TL_DCA']['tl_page']['fields']['autoUnindexGoogle'] = [
 	'exclude' => true,
 	'inputType' => 'checkbox',
 	'eval' => ['tl_class' => 'w50'],

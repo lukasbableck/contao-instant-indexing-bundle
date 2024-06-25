@@ -1,5 +1,4 @@
 <?php
-
 namespace LukasBableck\ContaoInstantIndexingBundle\ContaoManager;
 
 use Contao\CoreBundle\ContaoCoreBundle;

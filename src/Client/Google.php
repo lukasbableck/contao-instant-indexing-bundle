@@ -7,7 +7,6 @@ use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
 class Google {
-
 	public function __construct(private LoggerInterface $contaoGeneralLogger) {
 	}
 
@@ -33,6 +32,7 @@ class Google {
 
 		if (200 != $response->getStatusCode()) {
 			$this->contaoGeneralLogger->log(Logger::ERROR, 'Error while submitting URL: '.$response->getStatusCode(), ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
+
 			return;
 		}
 		$this->contaoGeneralLogger->log(Logger::INFO, 'URL submitted to Google: '.$url, ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);

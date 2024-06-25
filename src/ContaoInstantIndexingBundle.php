@@ -1,11 +1,7 @@
 <?php
-
 namespace LukasBableck\ContaoInstantIndexingBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-class ContaoInstantIndexingBundle extends Bundle {
-	public function getPath(): string {
-		return \dirname(__DIR__);
-	}
+class ContaoInstantIndexingBundle extends AbstractBundle {
 }
