@@ -2,6 +2,12 @@
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
+$GLOBALS['TL_DCA']['tl_page']['list']['operations']['indexGoogle'] = [
+	'label' => &$GLOBALS['TL_LANG']['MSC']['indexGoogle'],
+	'href' => 'key=indexGoogle',
+	'icon' => 'bundles/contaoinstantindexing/icons/google.svg',
+];
+
 $GLOBALS['TL_DCA']['tl_page']['fields']['googleServiceAccountJSON'] = [
 	'exclude' => true,
 	'inputType' => 'textarea',

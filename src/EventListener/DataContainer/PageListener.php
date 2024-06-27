@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class PageListener extends Backend {
+class PageListener {
 	private static $queue = [];
 
 	public function __construct(private Google $googleClient, private RequestStack $requestStack) {
@@ -57,19 +57,19 @@ class PageListener extends Backend {
 			return;
 		}
 		foreach (self::$queue as $item) {
-			if (array_key_exists('page', $item)) {
+			if (\array_key_exists('page', $item)) {
 				$page = PageModel::findByPk($item['page']);
 				$page->refresh();
 				$urlGenerator = System::getContainer()->get('contao.routing.content_url_generator');
 				$urlGenerator->reset();
 				$pageUrl = $urlGenerator->generate($page, [], UrlGeneratorInterface::ABSOLUTE_URL);
-				if (array_key_exists('delete', $item)) {
+				if (\array_key_exists('delete', $item)) {
 					$this->googleClient->publish($pageUrl, html_entity_decode($item['rootPage']->googleServiceAccountJSON, true));
 				} else {
 					$this->googleClient->publish($pageUrl, html_entity_decode($item['rootPage']->googleServiceAccountJSON));
 				}
-			}else if (array_key_exists('pageUrl', $item)) {
-				if (array_key_exists('delete', $item)) {
+			} elseif (\array_key_exists('pageUrl', $item)) {
+				if (\array_key_exists('delete', $item)) {
 					$this->googleClient->publish($item['pageUrl'], html_entity_decode($item['rootPage']->googleServiceAccountJSON, true));
 				} else {
 					$this->googleClient->publish($item['pageUrl'], html_entity_decode($item['rootPage']->googleServiceAccountJSON));

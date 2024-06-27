@@ -1,14 +1,13 @@
 <?php
 namespace LukasBableck\ContaoInstantIndexingBundle\EventListener\DataContainer;
 
-use Contao\Backend;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\Input;
 use Contao\PageModel;
 use LukasBableck\ContaoInstantIndexingBundle\Client\Google;
 
 #[AsHook('loadDataContainer')]
-class AddOperationsListener extends Backend {
+class AddOperationsListener {
 	public function __construct(private Google $googleClient) {
 	}
 
@@ -54,6 +53,10 @@ class AddOperationsListener extends Backend {
 				$rootPage = PageModel::findByPk($page->rootId);
 				$url = $page->getAbsoluteUrl();
 			} else {
+				return;
+			}
+
+			if ('regular' !== $page->type) {
 				return;
 			}
 
