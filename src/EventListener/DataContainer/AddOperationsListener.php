@@ -1,13 +1,14 @@
 <?php
-namespace LukasBableck\ContaoInstantIndexingBundle\EventListener\DataContainer;
+namespace Lukasbableck\ContaoInstantIndexingBundle\EventListener\DataContainer;
 
+use Contao\Backend;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\Input;
 use Contao\PageModel;
-use LukasBableck\ContaoInstantIndexingBundle\Client\Google;
+use Lukasbableck\ContaoInstantIndexingBundle\Client\Google;
 
 #[AsHook('loadDataContainer')]
-class AddOperationsListener {
+class AddOperationsListener extends Backend{
 	public function __construct(private Google $googleClient) {
 	}
 
@@ -20,6 +21,7 @@ class AddOperationsListener {
 			'label' => &$GLOBALS['TL_LANG']['MSC']['indexGoogle'],
 			'href' => 'key=indexGoogle',
 			'icon' => 'bundles/contaoinstantindexing/icons/google.svg',
+			'button_callback' => ['\Lukasbableck\ContaoInstantIndexingBundle\EventListener\DataContainer\ButtonListener', 'addIndexGoogleButton']
 		];
 
 		if ('indexGoogle' === Input::get('key') && Input::get('id')) {

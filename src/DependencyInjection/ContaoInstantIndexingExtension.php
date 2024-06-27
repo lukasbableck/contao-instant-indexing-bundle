@@ -1,5 +1,5 @@
 <?php
-namespace LukasBableck\ContaoInstantIndexingBundle\DependencyInjection;
+namespace Lukasbableck\ContaoInstantIndexingBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

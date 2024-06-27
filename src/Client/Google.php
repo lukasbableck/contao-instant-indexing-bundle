@@ -1,5 +1,5 @@
 <?php
-namespace LukasBableck\ContaoInstantIndexingBundle\Client;
+namespace Lukasbableck\ContaoInstantIndexingBundle\Client;
 
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Google\Client;

@@ -1,54 +1,22 @@
 <?php
-namespace LukasBableck\ContaoInstantIndexingBundle\EventListener\DataContainer;
+namespace Lukasbableck\ContaoInstantIndexingBundle\EventListener\DataContainer;
 
 use Contao\Backend;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
-use Contao\Image;
 use Contao\Input;
 use Contao\PageModel;
-use Contao\StringUtil;
 use Contao\System;
-use LukasBableck\ContaoInstantIndexingBundle\Client\Google;
+use Lukasbableck\ContaoInstantIndexingBundle\Client\Google;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class PageListener {
+class PageListener extends Backend{
 	private static $queue = [];
 
-	public function __construct(private Google $googleClient, private RequestStack $requestStack) {
-	}
-
-	#[AsCallback(table: 'tl_page', target: 'list.operations.indexGoogle.button')]
-	public function addIndexGoogleButton(
-		array $row,
-		?string $href,
-		string $label,
-		string $title,
-		?string $icon,
-		string $attributes,
-		string $table,
-		array $rootRecordIds,
-		?array $childRecordIds,
-		bool $circularReference,
-		?string $previous,
-		?string $next,
-		DataContainer $dc
-	): string {
-		if ('regular' !== $row['type']) {
-			return '';
-		}
-
-		return sprintf(
-			'<a href="%s" title="%s"%s>%s</a> ',
-			Backend::addToUrl($href.'&amp;id='.$row['id']),
-			StringUtil::specialchars($title),
-			$attributes,
-			Image::getHtml($icon, $label)
-		);
+	public function __construct(private Google $googleClient) {
 	}
 
 	#[AsEventListener(KernelEvents::TERMINATE)]

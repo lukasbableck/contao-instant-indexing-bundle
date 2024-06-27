@@ -36,10 +36,10 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"LukasBableck\\ContaoInstantIndexingBundle\\": "src/"
+			"Lukasbableck\\ContaoInstantIndexingBundle\\": "src/"
 		}
 	},
 	"extra": {
-		"contao-manager-plugin": "LukasBableck\\ContaoInstantIndexingBundle\\ContaoManager\\Plugin"
+		"contao-manager-plugin": "Lukasbableck\\ContaoInstantIndexingBundle\\ContaoManager\\Plugin"
 	}
 }

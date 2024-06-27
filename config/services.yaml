@@ -3,8 +3,8 @@ services:
         autowire: true
         autoconfigure: true
         public: false
-    LukasBableck\ContaoInstantIndexingBundle\:
+    Lukasbableck\ContaoInstantIndexingBundle\:
         resource: ../src
-    LukasBableck\ContaoInstantIndexingBundle\EventListener\:
-        resource: ../src/EventListener
+    Lukasbableck\ContaoInstantIndexingBundle\Client\:
+        resource: ../src/Client
         public: true
