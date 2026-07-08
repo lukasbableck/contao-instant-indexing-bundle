@@ -6,10 +6,17 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\Input;
 use Contao\PageModel;
 use Lukasbableck\ContaoInstantIndexingBundle\Client\Google;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsHook('loadDataContainer')]
-class AddOperationsListener extends Backend{
-	public function __construct(private Google $googleClient) {
+class AddOperationsListener extends Backend {
+	public function __construct(
+		private Google $googleClient,
+		private RequestStack $requestStack,
+		private TranslatorInterface $translator,
+	) {
 	}
 
 	public function __invoke(string $table): void {
@@ -19,12 +26,12 @@ class AddOperationsListener extends Backend{
 
 		$GLOBALS['TL_DCA'][$table]['list']['operations']['indexGoogle'] = [
 			'label' => &$GLOBALS['TL_LANG']['MSC']['indexGoogle'],
-			'href' => 'key=indexGoogle',
+			'href' => 'act=indexGoogle',
 			'icon' => 'bundles/contaoinstantindexing/icons/google.svg',
-			'button_callback' => ['\Lukasbableck\ContaoInstantIndexingBundle\EventListener\DataContainer\ButtonListener', 'addIndexGoogleButton']
+			'button_callback' => ['\Lukasbableck\ContaoInstantIndexingBundle\EventListener\DataContainer\ButtonListener', 'addIndexGoogleButton'],
 		];
 
-		if ('indexGoogle' === Input::get('key') && Input::get('id')) {
+		if ('indexGoogle' === Input::get('act') && Input::get('id')) {
 			$page = null;
 			$rootPage = null;
 			$model = null;
@@ -68,6 +75,10 @@ class AddOperationsListener extends Backend{
 
 			$this->googleClient->publish($url, html_entity_decode($rootPage->googleServiceAccountJSON));
 
+			$session = $this->requestStack->getMainRequest()->getSession();
+			if ($session instanceof Session) {
+				$session->getFlashBag()->add('contao.BE.confirm', \sprintf($this->translator->trans('instantIndexing.urlSubmitted', [], 'contao_instant_indexing'), $url));
+			}
 			$this->redirect($this->getReferer());
 		}
 	}
