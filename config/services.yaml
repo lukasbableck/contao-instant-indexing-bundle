@@ -8,3 +8,6 @@ services:
     Lukasbableck\ContaoInstantIndexingBundle\Client\:
         resource: ../src/Client
         public: true
+    Lukasbableck\ContaoInstantIndexingBundle\Controller\GoogleIndexingController:
+        arguments:
+            $contentUrlGenerator: '@contao.routing.content_url_generator'

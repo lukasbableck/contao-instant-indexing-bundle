@@ -1,21 +1,16 @@
 <?php
 namespace Lukasbableck\ContaoInstantIndexingBundle\EventListener\DataContainer;
 
-use Contao\Backend;
+use Contao\CoreBundle\DataContainer\DataContainerOperation;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
-use Contao\Input;
-use Contao\PageModel;
-use Lukasbableck\ContaoInstantIndexingBundle\Client\Google;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[AsHook('loadDataContainer')]
-class AddOperationsListener extends Backend {
+class AddOperationsListener {
 	public function __construct(
-		private Google $googleClient,
+		private UrlGeneratorInterface $urlGenerator,
 		private RequestStack $requestStack,
-		private TranslatorInterface $translator,
 	) {
 	}
 
@@ -26,60 +21,25 @@ class AddOperationsListener extends Backend {
 
 		$GLOBALS['TL_DCA'][$table]['list']['operations']['indexGoogle'] = [
 			'label' => &$GLOBALS['TL_LANG']['MSC']['indexGoogle'],
-			'href' => 'act=indexGoogle',
 			'icon' => 'bundles/contaoinstantindexing/icons/google.svg',
-			'button_callback' => ['\Lukasbableck\ContaoInstantIndexingBundle\EventListener\DataContainer\ButtonListener', 'addIndexGoogleButton'],
+			'button_callback' => [$this, 'addIndexGoogleButton'],
 		];
+	}
 
-		if ('indexGoogle' === Input::get('act') && Input::get('id')) {
-			$page = null;
-			$rootPage = null;
-			$model = null;
-			switch ($table) {
-				case 'tl_page':
-					$page = PageModel::findWithDetails(Input::get('id'));
-					break;
-				case 'tl_news':
-					$model = \Contao\NewsModel::findByPk(Input::get('id'));
-					break;
-				case 'tl_calendar_events':
-					$model = \Contao\CalendarEventsModel::findByPk(Input::get('id'));
-					break;
-				case 'tl_faq':
-					$model = \Contao\FaqModel::findByPk(Input::get('id'));
-			}
+	public function addIndexGoogleButton(DataContainerOperation $operation): void {
+		$row = $operation->getRecord();
+		$table = $operation->getDataContainer()->table;
 
-			if (null !== $model && null === $page) {
-				$archive = $model->getRelated('pid');
-				if (null !== $archive) {
-					$page = $archive->getRelated('jumpTo')->loadDetails();
-					$rootPage = PageModel::findByPk($page->rootId);
-					if (null !== $page) {
-						$url = $page->getAbsoluteUrl('/'.$model->alias);
-					}
-				}
-			} elseif (null === $model && null !== $page) {
-				$rootPage = PageModel::findByPk($page->rootId);
-				$url = $page->getAbsoluteUrl();
-			} else {
-				return;
-			}
+		if (null === $row || !isset($row['id']) || ('tl_page' === $table && 'regular' !== ($row['type'] ?? null))) {
+			$operation->hide();
 
-			if ('regular' !== $page->type) {
-				return;
-			}
-
-			if (null === $rootPage || !$rootPage->googleServiceAccountJSON) {
-				return;
-			}
-
-			$this->googleClient->publish($url, html_entity_decode($rootPage->googleServiceAccountJSON));
-
-			$session = $this->requestStack->getMainRequest()->getSession();
-			if ($session instanceof Session) {
-				$session->getFlashBag()->add('contao.BE.confirm', \sprintf($this->translator->trans('instantIndexing.urlSubmitted', [], 'contao_instant_indexing'), $url));
-			}
-			$this->redirect($this->getReferer());
+			return;
 		}
+
+		$operation->setUrl($this->urlGenerator->generate('contao_instant_indexing', [
+			'table' => $table,
+			'id' => $row['id'],
+			'return_url' => $this->requestStack->getCurrentRequest()?->getRequestUri(),
+		]));
 	}
 }

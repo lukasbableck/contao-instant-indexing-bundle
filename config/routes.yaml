@@ -1,0 +1,3 @@
+instant_indexing:
+    resource: ../src/Controller/
+    type: attribute

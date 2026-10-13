@@ -22,11 +22,11 @@ class ButtonListener {
 		?string $next,
 		DataContainer $dc
 	): string {
-		if ($table == "tl_page" && 'regular' !== $row['type']) {
+		if ('tl_page' == $table && 'regular' !== $row['type']) {
 			return '';
 		}
 
-		return sprintf(
+		return \sprintf(
 			'<a href="%s" title="%s"%s>%s</a> ',
 			Backend::addToUrl($href.'&amp;id='.$row['id']),
 			StringUtil::specialchars($title),

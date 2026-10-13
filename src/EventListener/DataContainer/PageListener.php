@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class PageListener extends Backend{
+class PageListener extends Backend {
 	private static $queue = [];
 
 	public function __construct(private Google $googleClient) {
